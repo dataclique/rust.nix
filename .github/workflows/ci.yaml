@@ -1,4 +1,3 @@
-# Mirrored at templates/ci/.github/workflows/ci.yaml — keep in sync.
 name: "CI"
 
 on:

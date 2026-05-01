@@ -74,6 +74,22 @@
             src = ./.;
             inherit hooks;
           };
+
+          # Enforce that the workflow shipped by `templates.ci` is
+          # byte-for-byte the workflow that runs on this repo.
+          ci-template-mirror = pkgs.runCommandLocal "ci-template-mirror" { } ''
+            if ! diff -u \
+              ${./.github/workflows/ci.yaml} \
+              ${./templates/ci/.github/workflows/ci.yaml}
+            then
+              echo
+              echo "templates/ci/.github/workflows/ci.yaml has drifted" \
+                   "from .github/workflows/ci.yaml." >&2
+              echo "Update both files to match." >&2
+              exit 1
+            fi
+            touch $out
+          '';
         };
       }) // {
         templates = {
@@ -91,11 +107,11 @@
                 2. `cargo run` to verify the toolchain.
                 3. Edit `Cargo.toml` to set your crate name.
 
-              Optional cleanup: this template inherits a `templates/`
-              subdirectory and a `templates` output in `flake.nix`, used so
-              the upstream repo can hand out sub-templates. If you don't
-              plan to re-expose templates from your project, you can delete
-              both. They are otherwise harmless.
+              Optional cleanup: this flake inherits a `templates` output
+              that re-exposes the project as a sub-template. If you don't
+              plan to re-expose templates from your project, you can
+              delete the `templates` block from `flake.nix`. It's
+              otherwise harmless.
             '';
           };
 
