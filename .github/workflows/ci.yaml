@@ -1,11 +1,12 @@
 # Mirrored at templates/ci/.github/workflows/ci.yaml — keep in sync.
-name: CI
+name: "CI"
 
 on:
   workflow_dispatch:
   pull_request:
   push:
-    branches: [master]
+    branches:
+    - master
 
 jobs:
   checks:
@@ -13,7 +14,9 @@ jobs:
       checks: write
       contents: read
       id-token: write
+      packages: write
       pull-requests: write
+      repository-projects: write
 
     runs-on: ${{ matrix.os }}
     strategy:
@@ -21,19 +24,19 @@ jobs:
         os: [ubuntu-latest]
 
     steps:
-      - uses: actions/checkout@v5
-      - uses: DeterminateSystems/nix-installer-action@main
-      - uses: DeterminateSystems/magic-nix-cache-action@main
-      - uses: DeterminateSystems/flake-checker-action@main
+    - uses: actions/checkout@v5
+    - uses: DeterminateSystems/nix-installer-action@main
+    - uses: DeterminateSystems/magic-nix-cache-action@main
+    - uses: DeterminateSystems/flake-checker-action@main
 
-      - name: nix flake check
-        run: nix -v flake check --show-trace --impure --accept-flake-config
+    - name: Run Flake checks
+      run: nix -v flake check --show-trace --impure --accept-flake-config
 
-      - name: cargo build
-        run: nix develop --impure --accept-flake-config -c cargo build --all-targets --locked
+    - name: cargo build
+      run: nix develop --impure --accept-flake-config -c cargo build --all-targets --locked
 
-      - name: cargo test
-        run: nix develop --impure --accept-flake-config -c cargo test --all-targets --locked
+    - name: cargo test
+      run: nix develop --impure --accept-flake-config -c cargo test --all-targets --locked
 
-      - name: cargo clippy
-        run: nix develop --impure --accept-flake-config -c cargo clippy --all-targets --locked -- -D warnings
+    - name: cargo clippy
+      run: nix develop --impure --accept-flake-config -c cargo clippy --all-targets --locked -- -D warnings
