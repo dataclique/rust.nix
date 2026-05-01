@@ -1,5 +1,20 @@
 # Rust Nix Flake Quickstart
 
+## Use as a Nix flake template
+
+Full Rust dev shell + CI:
+
+``` sh
+nix flake init -t github:data-cartel/rust.nix
+```
+
+CI only — drops just `.github/workflows/ci.yaml` into a project that
+already has a flake-based dev shell:
+
+``` sh
+nix flake init -t github:data-cartel/rust.nix#ci
+```
+
 ## Prerequisites
 
 Install Nix
