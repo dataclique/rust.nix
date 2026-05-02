@@ -44,13 +44,7 @@
             modules = [{
               # https://devenv.sh/reference/options/
               packages = with pkgs;
-                [ cargo-watch ] ++ lib.optionals stdenv.isDarwin
-                (with darwin.apple_sdk; [
-                  libiconv
-                  frameworks.Security
-                  frameworks.CoreFoundation
-                  frameworks.SystemConfiguration
-                ]);
+                [ cargo-watch ] ++ lib.optionals stdenv.isDarwin [ libiconv ];
 
               env.LOG_LEVEL = "DEBUG";
 
