@@ -18,7 +18,7 @@ let
   devenvModule =
     { ... }:
     {
-      packages = with pkgs; pkgs.lib.optionals stdenv.isDarwin [ libiconv ];
+      packages = pkgs.lib.optionals pkgs.stdenv.hostPlatform.isDarwin [ pkgs.libiconv ];
 
       languages.rust = {
         enable = true;
