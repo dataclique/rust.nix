@@ -18,7 +18,6 @@
       self,
       nixpkgs,
       flake-utils,
-      devenv,
       git-hooks,
       fenix,
       ...
@@ -32,68 +31,19 @@
         };
         toolchain = fenix.packages.${system}.default;
 
-        defaultHooks = {
-          actionlint.enable = true;
-          taplo.enable = true;
-          nixfmt.enable = true;
-
-          rustfmt = {
-            enable = true;
-            packageOverrides = { inherit (toolchain) cargo rustfmt; };
-          };
-        };
-
-        # Reusable devenv module: enables the Rust toolchain via fenix and
-        # wires the default git-hooks. Consumers compose this with their own
-        # modules via `lib.${system}.mkDevShell`.
-        devenvModule =
-          { ... }:
-          {
-            packages = with pkgs; lib.optionals stdenv.isDarwin [ libiconv ];
-
-            languages.rust = {
-              enable = true;
-              inherit toolchain;
-            };
-
-            difftastic.enable = true;
-            git-hooks = {
-              hooks = defaultHooks;
-            };
-          };
-
-        mkDevShell =
-          {
-            extraModules ? [ ],
-          }:
-          devenv.lib.mkShell {
-            inherit inputs pkgs;
-            modules = [ devenvModule ] ++ extraModules;
-          };
-
+        lib = import ./nix/lib.nix { inherit pkgs toolchain inputs; };
       in
       {
-        lib = {
-          inherit
-            toolchain
-            mkDevShell
-            devenvModule
-            ;
-          hooks = defaultHooks;
-        };
+        inherit lib;
 
-        devShells = {
-          default = mkDevShell { };
-        };
+        devShells.default = lib.mkDevShell { };
 
-        packages = {
-          devenv-up = self.devShells.${system}.default.config.procfileScript;
-        };
+        packages.devenv-up = self.devShells.${system}.default.config.procfileScript;
 
         checks = {
           pre-commit = git-hooks.lib.${system}.run {
             src = ./.;
-            hooks = defaultHooks;
+            inherit (lib) hooks;
           };
 
           # Enforce that the workflow shipped by `templates.ci` is
