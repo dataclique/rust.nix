@@ -15,6 +15,35 @@ already has a flake-based dev shell:
 nix flake init -t github:data-cartel/rust.nix#ci
 ```
 
+## Use as a flake input
+
+Consume the dev shell directly from another flake without copying any
+files. The repo exposes `lib.${system}.{mkDevShell,devenvModule,hooks,toolchain}`.
+
+``` nix
+{
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
+    flake-utils.url = "github:numtide/flake-utils";
+    rust-nix.url = "github:data-cartel/rust.nix";
+  };
+
+  outputs =
+    { nixpkgs, flake-utils, rust-nix, ... }:
+    flake-utils.lib.eachDefaultSystem (system: {
+      # Reuse the default shell as-is:
+      devShells.default = rust-nix.devShells.${system}.default;
+
+      # Or compose with extra devenv modules:
+      devShells.custom = rust-nix.lib.${system}.mkDevShell {
+        extraModules = [
+          ({ pkgs, ... }: { packages = [ pkgs.jq ]; })
+        ];
+      };
+    });
+}
+```
+
 ## Prerequisites
 
 Install Nix

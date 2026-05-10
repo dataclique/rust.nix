@@ -32,7 +32,7 @@
         };
         toolchain = fenix.packages.${system}.default;
 
-        hooks = {
+        defaultHooks = {
           actionlint.enable = true;
           taplo.enable = true;
           nixfmt.enable = true;
@@ -43,26 +43,47 @@
           };
         };
 
+        # Reusable devenv module: enables the Rust toolchain via fenix and
+        # wires the default git-hooks. Consumers compose this with their own
+        # modules via `lib.${system}.mkDevShell`.
+        devenvModule =
+          { ... }:
+          {
+            packages = with pkgs; lib.optionals stdenv.isDarwin [ libiconv ];
+
+            languages.rust = {
+              enable = true;
+              inherit toolchain;
+            };
+
+            difftastic.enable = true;
+            git-hooks = {
+              hooks = defaultHooks;
+            };
+          };
+
+        mkDevShell =
+          {
+            extraModules ? [ ],
+          }:
+          devenv.lib.mkShell {
+            inherit inputs pkgs;
+            modules = [ devenvModule ] ++ extraModules;
+          };
+
       in
       {
+        lib = {
+          inherit
+            toolchain
+            mkDevShell
+            devenvModule
+            ;
+          hooks = defaultHooks;
+        };
+
         devShells = {
-          default = devenv.lib.mkShell {
-            inherit inputs pkgs;
-            modules = [
-              {
-                # https://devenv.sh/reference/options/
-                packages = with pkgs; lib.optionals stdenv.isDarwin [ libiconv ];
-
-                languages.rust = {
-                  enable = true;
-                  inherit toolchain;
-                };
-
-                difftastic.enable = true;
-                git-hooks = { inherit hooks; };
-              }
-            ];
-          };
+          default = mkDevShell { };
         };
 
         packages = {
@@ -72,7 +93,7 @@
         checks = {
           pre-commit = git-hooks.lib.${system}.run {
             src = ./.;
-            inherit hooks;
+            hooks = defaultHooks;
           };
 
           # Enforce that the workflow shipped by `templates.ci` is
