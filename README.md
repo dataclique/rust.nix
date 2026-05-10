@@ -15,6 +15,14 @@ already has a flake-based dev shell:
 nix flake init -t github:data-cartel/rust.nix#ci
 ```
 
+Nix-only — drops just `flake.nix` and `.envrc` into an existing Rust
+project, leaving `Cargo.toml` and `src/` alone. The flake consumes
+`data-cartel/rust.nix` as an input and re-exposes its dev shell:
+
+``` sh
+nix flake init -t github:data-cartel/rust.nix#nix
+```
+
 ## Prerequisites
 
 Install Nix
