@@ -1,7 +1,7 @@
 [package]
 name = "rust-nix"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -9,3 +9,29 @@ edition = "2021"
 clap = { version = "4.6.1", features = ["derive", "env"] }
 tracing = "0.1.44"
 tracing-subscriber = "0.3.23"
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+# Zero tolerance for panics in non-test code
+unwrap_used = "deny"
+expect_used = "deny"
+panic = "deny"
+unreachable = "deny"
+unimplemented = "deny"
+indexing_slicing = "deny"
+
+enum_glob_use = "deny"
+
+pedantic = { level = "deny", priority = -1 }
+nursery = { level = "deny", priority = -1 }
+
+doc_markdown = "allow"
+items_after_statements = "allow"
+missing_const_for_fn = "allow"
+missing_docs_in_private_items = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+must_use_candidate = "allow"
+redundant_pub_crate = "allow"

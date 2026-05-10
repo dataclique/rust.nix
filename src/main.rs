@@ -1,5 +1,5 @@
 use clap::Parser;
-use tracing::*;
+use tracing::{Level, info};
 
 #[derive(Debug, Parser)]
 struct Env {
