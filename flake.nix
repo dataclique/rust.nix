@@ -98,6 +98,22 @@
             `cargo` and `clippy`.
           '';
         };
+
+        nix = {
+          path = ./templates/nix;
+          description = "Nix-only dev shell for an existing Rust project";
+          welcomeText = ''
+            # Nix-only template
+
+            Drops `flake.nix` and `.envrc` into an existing Rust project.
+            The flake consumes `data-cartel/rust.nix` as an input and
+            re-exposes its dev shell as `devShells.default`.
+
+            Next steps:
+              1. `direnv allow` (or `nix develop --impure`) to enter the dev shell.
+              2. `cargo build` to verify the toolchain.
+          '';
+        };
       };
     };
 

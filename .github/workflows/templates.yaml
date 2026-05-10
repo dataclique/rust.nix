@@ -1,0 +1,54 @@
+name: "Templates"
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+    - master
+
+jobs:
+  templates:
+    permissions:
+      checks: write
+      contents: read
+      id-token: write
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+
+    steps:
+    - uses: actions/checkout@v5
+    - uses: DeterminateSystems/nix-installer-action@main
+    - uses: DeterminateSystems/magic-nix-cache-action@main
+    - uses: DeterminateSystems/flake-checker-action@main
+
+    - name: Test rust template
+      run: |
+        tmp=$(mktemp -d)
+        cd "$tmp"
+        nix flake init -t "${GITHUB_WORKSPACE}#rust" --accept-flake-config
+        test -f Cargo.toml
+        test -f flake.nix
+        test -f src/main.rs
+        nix develop --impure --accept-flake-config -c rustc --version
+
+    - name: Test ci template
+      run: |
+        tmp=$(mktemp -d)
+        cd "$tmp"
+        nix flake init -t "${GITHUB_WORKSPACE}#ci" --accept-flake-config
+        test -f .github/workflows/ci.yaml
+
+    - name: Test nix template
+      run: |
+        tmp=$(mktemp -d)
+        cd "$tmp"
+        nix flake init -t "${GITHUB_WORKSPACE}#nix" --accept-flake-config
+        test -f flake.nix
+        test -f .envrc
+        nix develop --impure --accept-flake-config \
+          --override-input rust-nix "${GITHUB_WORKSPACE}" \
+          -c rustc --version
