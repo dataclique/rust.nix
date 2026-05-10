@@ -18,7 +18,6 @@
       self,
       nixpkgs,
       flake-utils,
-      devenv,
       git-hooks,
       fenix,
       ...
@@ -32,47 +31,19 @@
         };
         toolchain = fenix.packages.${system}.default;
 
-        hooks = {
-          actionlint.enable = true;
-          taplo.enable = true;
-          nixfmt.enable = true;
-
-          rustfmt = {
-            enable = true;
-            packageOverrides = { inherit (toolchain) cargo rustfmt; };
-          };
-        };
-
+        lib = import ./nix/lib.nix { inherit pkgs toolchain inputs; };
       in
       {
-        devShells = {
-          default = devenv.lib.mkShell {
-            inherit inputs pkgs;
-            modules = [
-              {
-                # https://devenv.sh/reference/options/
-                packages = with pkgs; lib.optionals stdenv.isDarwin [ libiconv ];
+        inherit lib;
 
-                languages.rust = {
-                  enable = true;
-                  inherit toolchain;
-                };
+        devShells.default = lib.mkDevShell { };
 
-                difftastic.enable = true;
-                git-hooks = { inherit hooks; };
-              }
-            ];
-          };
-        };
-
-        packages = {
-          devenv-up = self.devShells.${system}.default.config.procfileScript;
-        };
+        packages.devenv-up = self.devShells.${system}.default.config.procfileScript;
 
         checks = {
           pre-commit = git-hooks.lib.${system}.run {
             src = ./.;
-            inherit hooks;
+            inherit (lib) hooks;
           };
 
           # Enforce that the workflow shipped by `templates.ci` is
