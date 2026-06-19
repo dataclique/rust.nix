@@ -5,22 +5,22 @@
 Full Rust dev shell + CI:
 
 ``` sh
-nix flake init -t github:data-cartel/rust.nix
+nix flake init -t github:dataclique/rust.nix
 ```
 
 CI only — drops just `.github/workflows/ci.yaml` into a project that
 already has a flake-based dev shell:
 
 ``` sh
-nix flake init -t github:data-cartel/rust.nix#ci
+nix flake init -t github:dataclique/rust.nix#ci
 ```
 
 Nix-only — drops just `flake.nix` and `.envrc` into an existing Rust
 project, leaving `Cargo.toml` and `src/` alone. The flake consumes
-`data-cartel/rust.nix` as an input and re-exposes its dev shell:
+`dataclique/rust.nix` as an input and re-exposes its dev shell:
 
 ``` sh
-nix flake init -t github:data-cartel/rust.nix#nix
+nix flake init -t github:dataclique/rust.nix#nix
 ```
 
 ## Prerequisites

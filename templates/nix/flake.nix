@@ -2,7 +2,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
     flake-utils.url = "github:numtide/flake-utils";
-    rust-nix.url = "github:data-cartel/rust.nix";
+    rust-nix.url = "github:dataclique/rust.nix";
   };
 
   outputs =
