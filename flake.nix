@@ -106,7 +106,7 @@
             # Nix-only template
 
             Drops `flake.nix` and `.envrc` into an existing Rust project.
-            The flake consumes `data-cartel/rust.nix` as an input and
+            The flake consumes `dataclique/rust.nix` as an input and
             re-exposes its dev shell as `devShells.default`.
 
             Next steps:
